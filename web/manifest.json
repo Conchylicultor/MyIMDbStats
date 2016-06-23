@@ -1,0 +1,26 @@
+{
+  "name": "MyImdbStats",
+  "description": "Generate some statistics from the IMDb account",
+  "version": "0.1",
+  
+  "manifest_version": 2,
+  
+  "permissions": [
+    "storage", 
+    "http://*.imdb.com/"
+  ],
+  
+  "icons": { "16":  "img/icon_16.png",
+             "48":  "img/icon_48.png",
+             "128": "img/icon_128.png" },
+
+  "browser_action": {
+      "default_icon" : "img/action_button_48.png",
+      "default_title": "See the IMDb stats"
+  },
+  
+  "background": {
+    "scripts": ["src/launch.js"],
+    "persistent": false
+  }
+}
