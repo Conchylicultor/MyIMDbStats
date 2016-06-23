@@ -6,6 +6,9 @@ library Test1.lib.main_app;
 import 'dart:html';
 
 import 'package:polymer_elements/paper_input.dart';
+import 'package:polymer_elements/paper_drawer_panel.dart';
+import 'package:polymer_elements/paper_tab.dart';
+import 'package:polymer_elements/paper_tabs.dart';
 import 'package:polymer/polymer.dart';
 import 'package:web_components/web_components.dart';
 

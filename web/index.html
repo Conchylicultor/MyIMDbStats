@@ -9,12 +9,38 @@
 <head>
   <meta charset="utf-8">
   <title>IMDb Statistics</title>
-  
+
+  <!--  Polyfill of Custom Elements and HTML Imports -->
+  <script src="packages/web_components/webcomponents-lite.min.js"></script>
+
   <script defer type="application/dart" src="index.dart"></script>
   <script defer src="packages/browser/dart.js"></script>
+
+  <link rel="import" href="packages/polymer_elements/roboto.html">
+  <link rel="import" href="packages/polymer_elements/paper_drawer_panel.html">
+  <link rel="import" href="packages/polymer_elements/paper_header_panel.html">
+  <link rel="import" href="packages/polymer_elements/paper_toolbar.html">
+  <link rel="import" href="packages/polymer_elements/paper_icon_button.html">
+
+  <link rel="stylesheet" href="styles.css">
 </head>
 
-<body unresolved>
-  <main-app></main-app>
+<body class="fullbleed vertical layout">
+  <paper-drawer-panel class="flex">
+    <paper-header-panel drawer>
+      <paper-toolbar>
+        <div>Application</div>
+      </paper-toolbar>
+      <div> Drawer content... </div>
+    </paper-header-panel>
+    <paper-header-panel main>
+      <paper-toolbar>
+        <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+        <div>Title</div>
+      </paper-toolbar>
+      <div> Main content... </div>
+      <main-app></main-app>
+    </paper-header-panel>
+  </paper-drawer-panel>
 </body>
 </html>
