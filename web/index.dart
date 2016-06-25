@@ -3,8 +3,11 @@
 
 import 'package:my_imdb_stats/main_app.dart';
 import 'package:polymer/polymer.dart';
+import 'src/statistics.dart';
 
 /// [MainApp] used!
 main() async {
   await initPolymer();
+
+  launchStatistics(); // Get the IMDb statistics
 }

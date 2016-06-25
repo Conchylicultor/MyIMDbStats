@@ -20,6 +20,7 @@
   <link rel="import" href="packages/polymer_elements/paper_drawer_panel.html">
   <link rel="import" href="packages/polymer_elements/paper_header_panel.html">
   <link rel="import" href="packages/polymer_elements/paper_toolbar.html">
+  <link rel="import" href="packages/polymer_elements/paper_card.html">
   <link rel="import" href="packages/polymer_elements/paper_icon_button.html">
 
   <link rel="stylesheet" href="styles.css">
@@ -40,6 +41,12 @@
       </paper-toolbar>
       <div> Main content... </div>
       <main-app></main-app>
+      <paper-card heading="Card Title">
+        <div class="card-content">Some content</div>
+        <div class="card-actions">
+          <paper-button>Some action</paper-button>
+        </div>
+      </paper-card>
     </paper-header-panel>
   </paper-drawer-panel>
 </body>

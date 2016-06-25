@@ -11,6 +11,8 @@ dependencies:
   polymer: ^1.0.0-rc.15
   web_components: ^0.12.0
   chrome: any
+  csv_sheet:
+  js: ^0.6.0 # For the cross-scripting hack
   #async_await:
   #  git: git://github.com/dart-lang/async_await.git
 
@@ -21,7 +23,7 @@ transformers:
     entry_points: web/index.html
 - $dart2js:
     minify: true
-    csp: true
-    commandLineOptions:
-    - --trust-type-annotations
-    - --trust-primitives
+    csp: true # No effect ?
+    #commandLineOptions:
+    #- --trust-type-annotations
+    #- --trust-primitives
