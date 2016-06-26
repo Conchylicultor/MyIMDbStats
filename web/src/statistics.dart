@@ -1,9 +1,11 @@
 import 'dart:html';
+import 'dart:math';
 //import 'package:js/js.dart' as js;
 import 'package:csv_sheet/csv_sheet.dart';
-import 'package:plotly/plotly.dart';
+import 'package:plotly/plotly.dart' as plotly;
 
 import 'data.dart'; // TODO: To remove when Cross-Scripting limitation solved (chrome permissions)
+import 'utils.dart';
 
 /**
  * Struct which contains the data associated with a movie
@@ -58,12 +60,22 @@ void launchStatistics()
   // Part 2: Compute statistics
   loadGraphsDuration(movieData);
   loadGraphsMovieType(movieData);
+  loadGraphsDirectors(movieData);
+  // TODO: Ideas of stats
+  // Words cloud of the plots/synopsis
+  // Point cloud years vs rating (bubble size nb of movies from this director) ?
+  // Favourite actors
+  // Difference between my rating and the imdb rating (Top 200, distribution)
+  // Map movie origin (log scale)
+  // Map movie languages (log scale)
+  // Bar diagram of different genres repartition by the year
 }
 
 /**
  * Retrieve data from the IMDb account using the given userId
  * TODO: Load from Google Chrome Storage if
  * TODO: Cross-Scripting recovery
+ * TODO: Progress bar when loading
  */
 List<MovieData> loadData(String userId)
 {
@@ -125,11 +137,14 @@ List<MovieData> loadData(String userId)
     // 6 "Title type"
     nextMovie.titleType = row.row[6];
     // 7 "Directors"
-    //nextMovie.directors = row.row[7];
+    nextMovie.directors = row.row[7];
+    if(nextMovie.directors.isEmpty) {
+      print("Pb directors for: ${nextMovie.title} (${nextMovie.listId})");
+    }
     // 8 "You rated"
     try {
       nextMovie.myRating = double.parse(row.row[8]);
-    } catch(exception, stackTrace) {
+    } catch(exception) {
       print("Pb rating for: ${nextMovie.title} (${nextMovie.listId})");
     }
     // 9 "IMDb Rating"
@@ -137,10 +152,15 @@ List<MovieData> loadData(String userId)
     // 10 "Runtime (mins)"
     try {
       nextMovie.runtime = int.parse(row.row[10]);
-    } catch(exception, stackTrace) {
+    } catch(exception) {
       print("No runtime for: ${nextMovie.title} (${nextMovie.listId})");
     }
     // 11 "Year"
+    try {
+      nextMovie.year = int.parse(row.row[11]);
+    } catch(exception) {
+      print("No year for: ${nextMovie.title} (${nextMovie.listId})");
+    }
     // 12 "Genres"
     // 13 "Num. Votes"
     nextMovie.nbVotes = int.parse(row.row[13]);
@@ -197,4 +217,78 @@ void loadGraphsDuration(List<MovieData> movieData) {
 
 
   querySelector('#duration-text').text = "$nbWeeks weeks (about $nbMonths months), $nbDays days, $nbHours hours, $nbMinutes minutes";
+}
+
+/**
+ * Helper class for the director graphs
+ */
+class DirectorsData {
+  String name;
+
+  double avgMyRating;
+  double avgImdbRating;
+  int avgYear;
+  int nbMovies;
+}
+
+/**
+ * Compute the point-cloud of the directors
+ */
+void loadGraphsDirectors(List<MovieData> movieData) {
+  // Computing the data
+  var rng = new Random();
+
+  Map<String, DirectorsData> directorsData = new Map();
+  for (MovieData nextMovie in movieData) {
+      directorsData.containsKey(nextMovie.directors);
+    if (directorsData.containsKey(nextMovie.directors)) {
+      directorsData[nextMovie.directors].avgMyRating += nextMovie.myRating;
+      directorsData[nextMovie.directors].avgImdbRating += nextMovie.imdbRating;
+      directorsData[nextMovie.directors].avgYear += nextMovie.year;
+      directorsData[nextMovie.directors].nbMovies++;
+    } else if (!nextMovie.directors.isEmpty) { // We exclude the TV series (no directors)
+      DirectorsData newDirector = new DirectorsData();
+      newDirector.name = nextMovie.directors;
+      newDirector.avgMyRating = nextMovie.myRating;
+      newDirector.avgImdbRating = nextMovie.imdbRating;
+      newDirector.avgYear = nextMovie.year;
+      newDirector.nbMovies = 1;
+      directorsData[newDirector.name] = newDirector;
+    } else {
+      print("Exlude: ${nextMovie.title}");
+    }
+  }
+
+  List<double> dataX = new List();
+  List<double> dataY = new List();
+  List<String> dataText = new List();
+  for(DirectorsData nextDirector in directorsData.values) {
+    double noiseX = genNormDist(rng, dilatation: 25.0);
+    double noiseY = genNormDist(rng);
+    dataX.add(nextDirector.avgMyRating / nextDirector.nbMovies + noiseX);
+    dataY.add(nextDirector.nbMovies.toDouble() + noiseY);
+    dataText.add(nextDirector.name);
+  }
+
+  // Creating the graph
+
+  var trace = {
+    'x': dataX,
+    'y': dataY,
+    'text': dataText,
+    'mode': 'markers'
+  };
+
+  var layout = {
+    'title': 'Movies directors',
+    'hovermode':'closest',
+    'xaxis': {
+      'title': 'My rating'
+    },
+    'yaxis': {
+      'title': 'Nb of movie'
+    }
+  };
+
+  new plotly.Plot.id('graph-directors', [trace], layout);
 }

@@ -14,7 +14,7 @@ body {
 
 #main-content {
     margin: 0;
-    padding: 8px;
+    padding: 16px;
 
     text-align: center; /* TODO: Shouldn't be necessary (when the inline block will be resolved) */
 }
@@ -24,7 +24,7 @@ paper-card {
     text-align: left; /* Cancel the parent property TODO: Shouldn't be necessary (when the inline block will be resolved) */
 
     width: 70%;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
     margin-top: 0px;
     margin-left: auto;
     margin-right: auto;

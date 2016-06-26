@@ -24,6 +24,8 @@
   <link rel="import" href="packages/polymer_elements/paper_card.html">
   <link rel="import" href="packages/polymer_elements/paper_icon_button.html">
 
+  <script src="packages/plotly/plotly-latest.min.js"></script>
+
   <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -31,14 +33,14 @@
   <paper-drawer-panel class="flex">
     <paper-header-panel drawer>
       <paper-toolbar>
-        <div>Application</div>
+        <div>Menu</div>
       </paper-toolbar>
       <div> Drawer content... </div>
     </paper-header-panel>
     <paper-header-panel main>
       <paper-toolbar>
         <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-        <div>Title</div>
+        <div>Statistics</div>
       </paper-toolbar>
       <div id="main-content">
         <!--<main-app></main-app>-->
@@ -50,6 +52,11 @@
         <paper-card heading="Duration">
           <div class="card-content">
             <p>Total duration: <span id="duration-text"></span></p>
+          </div>
+        </paper-card>
+        <paper-card heading="Directors">
+          <div class="card-content">
+            <div id="graph-directors"></div>
           </div>
         </paper-card>
       </div>

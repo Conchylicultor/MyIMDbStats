@@ -13,7 +13,7 @@ main() async {
   runZoned(() {
     launchStatistics(); // Get the IMDb statistics
   }, onError: (error, stackTrace) {
-    print('Uncaught error 2: $error');
+    print('Uncaught error in statistic.dart: $error');
     print(stackTrace);
   });
 
