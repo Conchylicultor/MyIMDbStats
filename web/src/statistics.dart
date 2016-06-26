@@ -1,5 +1,6 @@
 import 'dart:html';
 import 'dart:math';
+import 'dart:convert';
 import 'dart:js';
 //import 'package:js/js.dart' as js;
 import 'package:csv_sheet/csv_sheet.dart';
@@ -35,11 +36,12 @@ class MovieData
   bool hasExternal = false; // We didn't load yet external data
 
   // Other infos
-  String countries;
-  String language;
+  List<String> countries;
+  List<String> languages;
   String writers;
   String actors;
   String plot;
+  String pgRating;
 }
 
 /**
@@ -70,8 +72,20 @@ void launchStatistics()
   // Map movie origin (log scale)
   // Map movie languages (log scale)
   // Bar diagram of different genres repartition by the year
+  // Stats on the PG rating (+18, etc)
 }
 
+
+/**
+ * Decode the information contained in the given string and add them to the
+ * given movieData
+ */
+void extractAdditionalData(MovieData movieData, String encodedData) {
+  Map decodedData = JSON.decode(encodedData);
+
+  movieData.languages = decodedData["Language"].split(", ");
+  movieData.countries = decodedData["Country"].split(", ");
+}
 /**
  * Retrieve data from the IMDb account using the given userId
  * TODO: Load from Google Chrome Storage if
@@ -80,7 +94,6 @@ void launchStatistics()
  */
 List<MovieData> loadData(String userId)
 {
-
 
   // Get the IMDb statistics
 
@@ -116,6 +129,10 @@ List<MovieData> loadData(String userId)
   */
 
   //print(data);
+
+
+  /*print("Clearing local storage");
+  window.localStorage.clear();*/
 
   print("Retrieving data...");
 
@@ -154,7 +171,7 @@ List<MovieData> loadData(String userId)
     try {
       nextMovie.runtime = int.parse(row.row[10]);
     } catch(exception) {
-      print("No runtime for: ${nextMovie.title} (${nextMovie.listId})");
+      // print("No runtime for: ${nextMovie.title} (${nextMovie.listId})");
     }
     // 11 "Year"
     try {
@@ -171,7 +188,26 @@ List<MovieData> loadData(String userId)
 
     // to continue...
 
-    // TODO: Load external data
+    // Load external data
+
+    // Check if already stored
+    if(window.localStorage.containsKey(nextMovie.imdbId)) { // If the movie is already in the database, we load it
+      // print("Retrieve ${nextMovie.imdbId} (${nextMovie.listId})");
+      extractAdditionalData(nextMovie, window.localStorage[nextMovie.imdbId]);
+      nextMovie.hasExternal = true;
+    } else { // Otherwise we retrieve the data from the webservice
+      String url = "http://omdbapi.com/?i=${nextMovie.imdbId}"; // Request webservice
+      HttpRequest.getString(url).then((String result) { // After callback:
+        print("Getting results for ${nextMovie.imdbId} (${nextMovie.listId})");
+
+        // Extract the data from the request
+        extractAdditionalData(nextMovie, result);
+
+        // Save the data
+        window.localStorage[nextMovie.imdbId] = result; // Save directly the string
+        nextMovie.hasExternal = true;
+      });
+    }
 
     movieData.add(nextMovie);
     //print(nextFilm.title);
