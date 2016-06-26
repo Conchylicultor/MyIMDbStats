@@ -1,5 +1,6 @@
 import 'dart:html';
 import 'dart:math';
+import 'dart:js';
 //import 'package:js/js.dart' as js;
 import 'package:csv_sheet/csv_sheet.dart';
 import 'package:plotly/plotly.dart' as plotly;
@@ -255,7 +256,7 @@ void loadGraphsDirectors(List<MovieData> movieData) {
       newDirector.nbMovies = 1;
       directorsData[newDirector.name] = newDirector;
     } else {
-      print("Exlude: ${nextMovie.title}");
+      // print("Exlude: ${nextMovie.title}");
     }
   }
 
@@ -290,5 +291,11 @@ void loadGraphsDirectors(List<MovieData> movieData) {
     }
   };
 
-  new plotly.Plot.id('graph-directors', [trace], layout);
+  plotly.Plot directorPlot = new plotly.Plot.id('graph-directors', [trace], layout, scrollZoom: true);
+  directorPlot.on('plotly_click').listen((JsObject event) {
+    print(dataText[event['points']['0']['pointNumber']]);
+    String directorName = dataText[event['points']['0']['pointNumber']];
+    directorName.replaceAll(" ", "+"); // TODO: Case of special characters
+    window.open("https://google.com/search?q=$directorName", ""); // Open the selected director in a new tab
+  });
 }

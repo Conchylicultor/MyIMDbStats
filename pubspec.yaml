@@ -23,7 +23,7 @@ transformers:
 - polymer:
     entry_points: web/index.html
 - $dart2js:
-    minify: true
+    #minify: true # Desactivate for debugging
     csp: true # No effect ?
     #commandLineOptions:
     #- --trust-type-annotations
