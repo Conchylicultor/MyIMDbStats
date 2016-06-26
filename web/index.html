@@ -17,6 +17,7 @@
   <script defer src="packages/browser/dart.js"></script>
 
   <link rel="import" href="packages/polymer_elements/roboto.html">
+  <link rel="import" href="packages/polymer_elements/shadow.html"><!-- Is useless. TODO: How to control the cards elevation ? -->
   <link rel="import" href="packages/polymer_elements/paper_drawer_panel.html">
   <link rel="import" href="packages/polymer_elements/paper_header_panel.html">
   <link rel="import" href="packages/polymer_elements/paper_toolbar.html">
@@ -39,14 +40,20 @@
         <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
         <div>Title</div>
       </paper-toolbar>
-      <div> Main content... </div>
-      <main-app></main-app>
-      <paper-card heading="Card Title">
-        <div class="card-content">Some content</div>
-        <div class="card-actions">
-          <paper-button>Some action</paper-button>
-        </div>
-      </paper-card>
+      <div id="main-content">
+        <!--<main-app></main-app>-->
+        <paper-card heading="Movie type">
+          <div class="card-content">
+            <div id="graph-movieType"></div>
+          </div>
+        </paper-card>
+        <paper-card heading="Duration">
+          <div class="card-content">
+            <p>Total duration: <span id="duration-text"></span></p>
+          </div>
+        </paper-card>
+      </div>
+
     </paper-header-panel>
   </paper-drawer-panel>
 </body>

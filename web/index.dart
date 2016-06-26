@@ -4,10 +4,17 @@
 import 'package:my_imdb_stats/main_app.dart';
 import 'package:polymer/polymer.dart';
 import 'src/statistics.dart';
+import 'dart:async';
 
 /// [MainApp] used!
 main() async {
   await initPolymer();
 
-  launchStatistics(); // Get the IMDb statistics
+  runZoned(() {
+    launchStatistics(); // Get the IMDb statistics
+  }, onError: (error, stackTrace) {
+    print('Uncaught error 2: $error');
+    print(stackTrace);
+  });
+
 }

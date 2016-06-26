@@ -12,6 +12,7 @@ dependencies:
   web_components: ^0.12.0
   chrome: any
   csv_sheet:
+  plotly: ^0.0.6 # For plotting the graphs
   js: ^0.6.0 # For the cross-scripting hack
   #async_await:
   #  git: git://github.com/dart-lang/async_await.git
