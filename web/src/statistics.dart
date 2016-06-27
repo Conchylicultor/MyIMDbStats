@@ -64,6 +64,7 @@ void launchStatistics()
   loadGraphsDuration(movieData);
   loadGraphsMovieType(movieData);
   loadGraphsDirectors(movieData);
+  loadGraphsCountries(movieData);
   // TODO: Ideas of stats
   // Words cloud of the plots/synopsis
   // Point cloud years vs rating (bubble size nb of movies from this director) ?
@@ -73,6 +74,7 @@ void launchStatistics()
   // Map movie languages (log scale)
   // Bar diagram of different genres repartition by the year
   // Stats on the PG rating (+18, etc)
+  // Oscars nomination and cie
 }
 
 
@@ -277,7 +279,6 @@ void loadGraphsDirectors(List<MovieData> movieData) {
 
   Map<String, DirectorsData> directorsData = new Map();
   for (MovieData nextMovie in movieData) {
-      directorsData.containsKey(nextMovie.directors);
     if (directorsData.containsKey(nextMovie.directors)) {
       directorsData[nextMovie.directors].avgMyRating += nextMovie.myRating;
       directorsData[nextMovie.directors].avgImdbRating += nextMovie.imdbRating;
@@ -323,7 +324,7 @@ void loadGraphsDirectors(List<MovieData> movieData) {
       'title': 'My rating'
     },
     'yaxis': {
-      'title': 'Nb of movie'
+      'title': 'Nb of movies'
     }
   };
 
@@ -333,5 +334,123 @@ void loadGraphsDirectors(List<MovieData> movieData) {
     String directorName = dataText[event['points']['0']['pointNumber']];
     directorName.replaceAll(" ", "+"); // TODO: Case of special characters
     window.open("https://google.com/search?q=$directorName", ""); // Open the selected director in a new tab
+  });
+}
+
+/**
+ * Some container class
+ */
+class CountryData {
+  String name;
+  double nbMovies;
+  String moviesTitles;
+}
+
+class LanguageData {
+  String name;
+  double nbMovies; // TODO: Make distinction between main language/secondary language (bi-colors bar chart) ; Also separate movie titles
+  String moviesTitles; // To recover all movies of a particular language (TODO: Could by optimized by being replaced by a list of listId)
+}
+
+/**
+ * Some stats about the localisations
+ */
+void loadGraphsCountries(List<MovieData> movieData) {
+  // Compute the data
+
+  Map<String, CountryData> countryData = new Map();
+  Map<String, LanguageData> languageData = new Map();
+  for (MovieData nextMovie in movieData) {
+    // Extract countries
+    for (String country in nextMovie.countries) {
+      if (!countryData.containsKey(country)) { // If new country, we add it
+        countryData[country] = new CountryData();
+        countryData[country].name = country;
+        countryData[country].nbMovies = 0.0;
+        countryData[country].moviesTitles = "";
+      }
+      countryData[country].nbMovies += 1/nextMovie.countries.length; // We add the participation of the country/language
+      countryData[country].moviesTitles += nextMovie.title + "<br />";
+    }
+
+    // Extract languages
+    for (String language in nextMovie.languages) {
+      if (!languageData.containsKey(language)) {
+        languageData[language] = new LanguageData();
+        languageData[language].name = language;
+        languageData[language].nbMovies = 0.0;
+        languageData[language].moviesTitles = "";
+      }
+      languageData[language].nbMovies += 1/nextMovie.languages.length; // We add the participation of the country/language
+      languageData[language].moviesTitles += nextMovie.title + "<br />";
+    }
+  }
+
+  List<String> dataCountriesX = new List();
+  List<double> dataCountriesY = new List();
+  for(CountryData nextCountry in countryData.values) {
+    dataCountriesX.add(nextCountry.name);
+    dataCountriesY.add(nextCountry.nbMovies);
+  }
+
+  // TODO: Sort languages by nb of movies ???
+  List<String> dataLanguagesX = new List();
+  List<double> dataLanguagesY = new List();
+  for(LanguageData nextLanguage in languageData.values) {
+    dataLanguagesX.add(nextLanguage.name);
+    dataLanguagesY.add(nextLanguage.nbMovies);
+  }
+
+  // Load the graphs
+
+  // Countries
+  var countriesTable = [{
+    'type': 'choropleth',
+    'locationmode': 'country names',
+    'locations': dataCountriesX,
+    'z': dataCountriesY,
+    'text': dataCountriesX,
+    'autocolorscale': true
+  }];
+
+  var countriesLayout = {
+    'title': 'Countries distribution',
+    'geo': {
+      'projection': {
+      'type': 'robinson'
+      }
+    }
+  };
+
+  plotly.Plot countriesPlot = new plotly.Plot.id('graph-countries', countriesTable, countriesLayout);
+  countriesPlot.on('plotly_click').listen((JsObject event) {
+    int idSelected = event['points']['0']['pointNumber'];
+    String countrySelected = dataCountriesX[idSelected];
+    querySelector("#graph-languages-details").innerHtml = countryData[countrySelected].moviesTitles;
+  });
+
+  // Language
+  var languagesTable = [{
+    'x': dataLanguagesX,
+    'y': dataLanguagesY,
+    'type': 'bar'
+  }];
+
+  var languagesLayout = {
+    'title': 'Movies directors',
+    'hovermode':'closest',
+    'xaxis': {
+      'title': 'Languages'
+    },
+    'yaxis': {
+      'title': 'Nb of movies'
+    }
+  };
+
+  plotly.Plot languagePlot = new plotly.Plot.id('graph-languages', languagesTable, languagesLayout);
+  languagePlot.on('plotly_click').listen((JsObject event) {
+    int idSelected = event['points']['0']['pointNumber'];
+    String languageSelected = dataLanguagesX[idSelected];
+    querySelector("#graph-languages-details").innerHtml = languageData[languageSelected].moviesTitles;
   });
 }
